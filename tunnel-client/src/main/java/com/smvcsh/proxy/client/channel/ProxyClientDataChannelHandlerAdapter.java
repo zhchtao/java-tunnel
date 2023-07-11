@@ -2,7 +2,7 @@ package com.smvcsh.proxy.client.channel;
 
 import com.smvcsh.proxy.handler.ProxyDataMessage;
 import com.smvcsh.proxy.handler.constants.ProxyDataMessageConstants;
-import com.smvcsh.proxy.manager.ManagerInit;
+import com.smvcsh.proxy.manager.ClientChannelManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -10,21 +10,20 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 /**
  * @author taotao
  *
  */
 @Sharable
-@Component
+//@Component
 public class ProxyClientDataChannelHandlerAdapter extends ProxyClientChannelHandlerAdapter {
-	
-	@Resource
-	private ManagerInit managerInit;
-	
+
+	public ProxyClientDataChannelHandlerAdapter(@NonNull ClientChannelManager clientChannelManager) {
+		super(clientChannelManager);
+	}
+
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
