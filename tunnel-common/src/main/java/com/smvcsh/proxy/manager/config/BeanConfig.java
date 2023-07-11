@@ -12,7 +12,7 @@ import java.util.Map;
 public class BeanConfig {
 
 	@Bean 
-	public Map<Integer, IpRelation> ipRelationMap(@Value("${proxy.bus.server.list:3306:192.168.6.63:3306,8300:192.168.6.63:8300}") String proxyConfig){
+	public Map<Integer, IpRelation> ipRelationMap(@Value("${proxy.bus.server.list:50000:172.16.192.202:50000,8081:172.16.192.202:8081}") String proxyConfig){
 		
 		Map<Integer, IpRelation> relationMap = new HashMap<>();
 		
