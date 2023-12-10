@@ -27,7 +27,7 @@ public class ManagerInit implements ApplicationRunner {
 	@Resource
 	private Map<Integer, IpRelation> ipRelationMap;
 	
-	@Value("${proxy.data.server:192.168.1.100:10000}")
+	@Value("#{'${proxy.data.server:192.168.1.100:10000}'.split(',')}")
 	private List<String> dataServer;
 	private List<ClientChannelManager> cmList;
 

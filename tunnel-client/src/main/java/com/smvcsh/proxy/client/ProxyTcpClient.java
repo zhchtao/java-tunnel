@@ -18,7 +18,7 @@ public abstract class ProxyTcpClient {
 	private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(2);
 	private Bootstrap b = new Bootstrap();
 	
-	public ProxyTcpClient() {
+	protected ProxyTcpClient() {
 		super();
 		// TODO Auto-generated constructor stub
 		
@@ -40,7 +40,6 @@ public abstract class ProxyTcpClient {
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			logger.error(e.getMessage(), e);
-//			stop();
 			throw new ProjectException(e);
 		}
 		
