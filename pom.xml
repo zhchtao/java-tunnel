@@ -27,6 +27,7 @@
         <module>tunnel-server</module>
         <module>tunnel-client</module>
         <module>tunnel-common</module>
+        <module>tunnel-jenkins-agent</module>
     </modules>
 
 </project>
