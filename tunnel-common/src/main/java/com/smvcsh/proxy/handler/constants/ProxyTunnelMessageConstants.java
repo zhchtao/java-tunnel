@@ -1,6 +1,6 @@
 package com.smvcsh.proxy.handler.constants;
 
-public class ProxyDataMessageConstants {
+public class ProxyTunnelMessageConstants {
 	
 	public static class OPERATE_CODE {
 		

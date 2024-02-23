@@ -2,7 +2,7 @@ package com.smvcsh.proxy.manager;
 
 import com.smvcsh.proxy.client.ProxyTcpClient;
 import com.smvcsh.proxy.handler.ProxyDataMessage;
-import com.smvcsh.proxy.handler.constants.ProxyDataMessageConstants;
+import com.smvcsh.proxy.handler.constants.ProxyTunnelMessageConstants;
 import com.smvcsh.proxy.manager.relation.IpRelation;
 import io.netty.channel.ChannelFuture;
 import org.apache.commons.lang3.ArrayUtils;
@@ -95,7 +95,7 @@ public class ManagerInit implements ApplicationRunner {
 	@Scheduled(cron = "0/10 * * * * ?")
 	private void healthCheck() {
 		ProxyDataMessage msg = new ProxyDataMessage();
-		msg.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.CONNECT_CHECK);
+		msg.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT_CHECK);
 		cmList.parallelStream().forEach(manager -> {
 
 			try {

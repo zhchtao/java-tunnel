@@ -2,17 +2,17 @@ package com.smvcsh.proxy.server;
 
 import com.smvcsh.proxy.handler.codec.ProxyDataRequestDecode;
 import com.smvcsh.proxy.handler.codec.ProxyDataResponseEncode;
-import com.smvcsh.proxy.server.channel.ProxyServerDataChannelHandlerAdapter;
+import com.smvcsh.proxy.server.channel.ProxyServerTunnelChannelHandlerAdapter;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 @Component
-public class ProxyTcpDataServer extends ProxyTcpServer {
+public class ProxyTcpTunnelServer extends ProxyTcpServer {
 
 	@Resource
-	private ProxyServerDataChannelHandlerAdapter handler;
+	private ProxyServerTunnelChannelHandlerAdapter handler;
 	
 	@Override
 	protected ChannelHandler[] addLast() {

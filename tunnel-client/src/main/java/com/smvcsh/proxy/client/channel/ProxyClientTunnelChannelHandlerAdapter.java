@@ -1,7 +1,7 @@
 package com.smvcsh.proxy.client.channel;
 
 import com.smvcsh.proxy.handler.ProxyDataMessage;
-import com.smvcsh.proxy.handler.constants.ProxyDataMessageConstants;
+import com.smvcsh.proxy.handler.constants.ProxyTunnelMessageConstants;
 import com.smvcsh.proxy.manager.ClientChannelManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -18,9 +18,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Sharable
 //@Component
-public class ProxyClientDataChannelHandlerAdapter extends ProxyClientChannelHandlerAdapter {
+public class ProxyClientTunnelChannelHandlerAdapter extends ProxyClientChannelHandlerAdapter {
 
-	public ProxyClientDataChannelHandlerAdapter(@NonNull ClientChannelManager clientChannelManager) {
+	public ProxyClientTunnelChannelHandlerAdapter(@NonNull ClientChannelManager clientChannelManager) {
 		super(clientChannelManager);
 	}
 
@@ -28,29 +28,28 @@ public class ProxyClientDataChannelHandlerAdapter extends ProxyClientChannelHand
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
 		
-		logger.info("data client close {}", ctx.channel().id().asShortText());
+		logger.info("tunnel client remove:{}", ctx.channel().id().asShortText());
 		
-		clientChannelManager.remove(ctx);
+		clientChannelManager.removeTunnelCtx(ctx);
 	}
 
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		logger.info("data client add {}", ctx.channel().id().asShortText());
-		clientChannelManager.addProxyCtx(ctx);
+		logger.info("tunnel client add:{}", ctx.channel().id().asShortText());
+		clientChannelManager.addTunnelCtx(ctx);
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		// TODO Auto-generated method stub
-//		serverContext.writeAndFlush(msg);
 		try {
 			
 			ProxyDataMessage data = (ProxyDataMessage) msg;
 			
-			logger.info("data message operate {}", data.getOperateCode());
+			logger.info("tunnel message operate:{}", data.getOperateCode());
 			
-			if(ProxyDataMessageConstants.OPERATE_CODE.CONNECT_CHECK == data.getOperateCode()) {
+			if(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT_CHECK == data.getOperateCode()) {
 				return;
 			}
 			
@@ -60,7 +59,7 @@ public class ProxyClientDataChannelHandlerAdapter extends ProxyClientChannelHand
 			ChannelHandlerContext targetCtx = clientChannelManager.getChannelCtx(StringUtils.isNotBlank(target) ? target: source);
 
 			
-			if(ProxyDataMessageConstants.OPERATE_CODE.CLOSE_CONNECT == data.getOperateCode()) {
+			if(ProxyTunnelMessageConstants.OPERATE_CODE.CLOSE_CONNECT == data.getOperateCode()) {
 				
 				if(null != targetCtx) {
 					targetCtx
@@ -85,12 +84,12 @@ public class ProxyClientDataChannelHandlerAdapter extends ProxyClientChannelHand
 				
 			}
 			
-			if(ProxyDataMessageConstants.OPERATE_CODE.CONNECT == data.getOperateCode()) {
+			if(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT == data.getOperateCode()) {
 				return;
 			}
 			
 			
-			logger.info("server response {}", targetCtx.channel().id().asShortText());
+			logger.info("server response:{}", targetCtx.channel().id().asShortText());
 			
 			ByteBuf buf = targetCtx.alloc().buffer(data.getDataLength());
 			buf.writeBytes(data.getData());
@@ -106,16 +105,13 @@ public class ProxyClientDataChannelHandlerAdapter extends ProxyClientChannelHand
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 		// TODO Auto-generated method stub
-		
+
+		logger.info("tunnel time out");
+
+		ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
+				.addListener(ChannelFutureListener.CLOSE);
+
 		super.userEventTriggered(ctx, evt);
-		
-		logger.info("client time out");
-		
-		ctx
-		.writeAndFlush(Unpooled.EMPTY_BUFFER)
-		.addListener(ChannelFutureListener.CLOSE);
-		
-//		managerInit.initClient();
 	}
 	
 }
