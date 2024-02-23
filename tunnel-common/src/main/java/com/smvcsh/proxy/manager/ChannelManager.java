@@ -41,10 +41,9 @@ public class ChannelManager {
 		return proxyDataCtx;
 	}
 	
-	public void addProxyCtx(ChannelHandlerContext ctx) {
+	public void addTunnelCtx(ChannelHandlerContext ctx) {
 		
 		channelHandlers.add(ctx);
-		addChannelCtx(ctx);
 	}
 	
 	public void addChannelCtx(ChannelHandlerContext ctx) {
@@ -52,10 +51,10 @@ public class ChannelManager {
 		idChannelHandlerMap.put(ctx.channel().id().asLongText(), new ChannelRelation(ctx));
 	}
 	
-	public void addChannelCtx(ChannelHandlerContext ctx, String remotChannel) {
+	public void addChannelCtx(ChannelHandlerContext ctx, String remoteChannel) {
 		
-		idChannelHandlerMap.put(ctx.channel().id().asLongText(), new ChannelRelation(ctx, remotChannel));
-		idChannelHandlerMap.put(remotChannel, idChannelHandlerMap.get(ctx.channel().id().asLongText()));
+		idChannelHandlerMap.put(ctx.channel().id().asLongText(), new ChannelRelation(ctx, remoteChannel));
+		idChannelHandlerMap.put(remoteChannel, idChannelHandlerMap.get(ctx.channel().id().asLongText()));
 	}
 	
 	public ChannelHandlerContext getChannelCtx(String ctxId) {
@@ -83,8 +82,6 @@ public class ChannelManager {
 				ChannelRelation channelRelation = idChannelHandlerMap.remove(key);
 				idChannelHandlerMap.remove(channelRelation.getRemotChannel());
 			}
-			
-			channelHandlers.remove(targetCtx);
 		}
 	}
 
@@ -92,5 +89,19 @@ public class ChannelManager {
 		// TODO Auto-generated method stub
 		return this.channelHandlers.size();
 	}
-	
+
+	public void removeTunnelCtx(ChannelHandlerContext ctx) {
+		channelHandlers.remove(ctx);
+		idChannelHandlerMap.values()
+				.forEach(v -> {
+					try {
+
+						logger.info("close ctx:{}", v.getCtx());
+						v.getCtx().close();
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+					}
+				});
+		idChannelHandlerMap.clear();
+	}
 }

@@ -1,10 +1,10 @@
 package com.smvcsh.proxy.manager;
 
 import com.smvcsh.proxy.handler.ProxyDataMessage;
-import com.smvcsh.proxy.handler.constants.ProxyDataMessageConstants;
+import com.smvcsh.proxy.handler.constants.ProxyTunnelMessageConstants;
 import com.smvcsh.proxy.manager.relation.IpRelation;
 import com.smvcsh.proxy.server.ProxyTcpBusServer;
-import com.smvcsh.proxy.server.ProxyTcpDataServer;
+import com.smvcsh.proxy.server.ProxyTcpTunnelServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,7 @@ public class ManagerInit implements ApplicationRunner {
 	private ChannelManager serverChannelManager;
 
 	@Resource
-	private ProxyTcpDataServer proxyTcpDataServer;
+	private ProxyTcpTunnelServer proxyTcpDataServer;
 	@Resource
 	private ProxyTcpBusServer proxyTcpBusServer;
 	
@@ -83,7 +83,7 @@ public class ManagerInit implements ApplicationRunner {
 		try {
 			
 			ProxyDataMessage msg = new ProxyDataMessage();
-			msg.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.CONNECT_CHECK);
+			msg.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT_CHECK);
 
 			logger.info("server check {}", serverChannelManager.proxyChannlCtxSize());
 

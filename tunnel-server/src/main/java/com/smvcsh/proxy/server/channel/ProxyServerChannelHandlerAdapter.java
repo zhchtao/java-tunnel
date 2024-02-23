@@ -1,6 +1,8 @@
 package com.smvcsh.proxy.server.channel;
 
 import com.smvcsh.proxy.manager.ServerChannelManager;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -26,7 +28,19 @@ public class ProxyServerChannelHandlerAdapter extends ChannelInboundHandlerAdapt
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		// TODO Auto-generated method stub
 		logger.error(ctx.toString(), cause);
-		super.exceptionCaught(ctx, cause);
+
+		if (ctx.isRemoved()) {
+			return;
+		}
+
+		try {
+
+			ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
+					.addListener(ChannelFutureListener.CLOSE);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			ctx.close();
+		}
 	}
 
 }

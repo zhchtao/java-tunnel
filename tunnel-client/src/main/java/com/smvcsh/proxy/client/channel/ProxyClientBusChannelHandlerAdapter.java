@@ -1,7 +1,7 @@
 package com.smvcsh.proxy.client.channel;
 
 import com.smvcsh.proxy.handler.ProxyDataMessage;
-import com.smvcsh.proxy.handler.constants.ProxyDataMessageConstants;
+import com.smvcsh.proxy.handler.constants.ProxyTunnelMessageConstants;
 import com.smvcsh.proxy.manager.ClientChannelManager;
 import com.smvcsh.proxy.manager.channel.ChannelRelation;
 import io.netty.buffer.ByteBuf;
@@ -9,7 +9,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
+
 /**
  * @author taotao
  *
@@ -23,24 +23,28 @@ public class ProxyClientBusChannelHandlerAdapter extends ProxyClientChannelHandl
 	}
 
 	@Override
-	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+	public void handlerRemoved(ChannelHandlerContext ctx) {
 		// TODO Auto-generated method stub
-		
-		ChannelRelation relation = clientChannelManager.getChannelRelation(ctx);
-		
-		if(null != relation) {
-			ProxyDataMessage proxyData = new ProxyDataMessage();
-			
-			proxyData.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.CLOSE_CONNECT);
-			proxyData.setSource(ctx.channel().id().asLongText());
-			proxyData.setTarget(relation.getRemotChannel());
-			
-			clientChannelManager.proxyChannlCtx().writeAndFlush(proxyData);
+		try {
+
+			ChannelRelation relation = clientChannelManager.getChannelRelation(ctx);
+
+			if(null != relation) {
+				ProxyDataMessage proxyData = new ProxyDataMessage();
+
+				proxyData.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.CLOSE_CONNECT);
+				proxyData.setSource(ctx.channel().id().asLongText());
+				proxyData.setTarget(relation.getRemotChannel());
+
+				clientChannelManager.proxyChannlCtx().writeAndFlush(proxyData);
+			}
+		} finally {
+
+			clientChannelManager.remove(ctx);
+
+			logger.info("bus client close {}", ctx.channel().id().asShortText());
 		}
-		
-		clientChannelManager.remove(ctx);
-		
-		logger.info("bus client close {}", ctx.channel().id().asShortText());
+
 	}
 
 	@Override
@@ -68,7 +72,7 @@ public class ProxyClientBusChannelHandlerAdapter extends ProxyClientChannelHandl
 				
 				ProxyDataMessage proxyData = new ProxyDataMessage();
 				
-				proxyData.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.DATA_PROXY);
+				proxyData.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.DATA_PROXY);
 				proxyData.setData(b);
 				proxyData.setSource(ctx.channel().id().asLongText());
 				proxyData.setTarget(target);

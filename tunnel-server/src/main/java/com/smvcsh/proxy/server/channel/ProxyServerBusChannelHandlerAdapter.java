@@ -1,7 +1,7 @@
 package com.smvcsh.proxy.server.channel;
 
 import com.smvcsh.proxy.handler.ProxyDataMessage;
-import com.smvcsh.proxy.handler.constants.ProxyDataMessageConstants;
+import com.smvcsh.proxy.handler.constants.ProxyTunnelMessageConstants;
 import com.smvcsh.proxy.manager.channel.ChannelRelation;
 import com.smvcsh.proxy.manager.relation.IpRelation;
 import io.netty.buffer.ByteBuf;
@@ -51,7 +51,7 @@ public class ProxyServerBusChannelHandlerAdapter extends ProxyServerChannelHandl
 				}
 				
 				
-				proxyData.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.DATA_PROXY);
+				proxyData.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.DATA_PROXY);
 				proxyData.setData(b);
 				proxyData.setSource(ctx.channel().id().asLongText());
 				proxyData.setTarget(StringUtils.trimToEmpty(target));
@@ -85,7 +85,7 @@ public class ProxyServerBusChannelHandlerAdapter extends ProxyServerChannelHandl
 				
 				msg.setHost(ip.getRemotHost());
 				msg.setPort(ip.getRemotPort());
-				msg.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.CONNECT);
+				msg.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT);
 				msg.setSource(ctx.channel().id().asLongText());
 				
 				proxyDataCtx.writeAndFlush(msg);
@@ -102,20 +102,24 @@ public class ProxyServerBusChannelHandlerAdapter extends ProxyServerChannelHandl
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-//		super.handlerRemoved(ctx);
-		ChannelRelation relation = serverChannelManager.getChannelRelation(ctx);
-		
-		if(null != relation) {
-			ProxyDataMessage proxyData = new ProxyDataMessage();
-			
-			proxyData.setOperateCode(ProxyDataMessageConstants.OPERATE_CODE.CLOSE_CONNECT);
-			proxyData.setSource(ctx.channel().id().asLongText());
-			proxyData.setTarget(relation.getRemotChannel());
-			
-			serverChannelManager.proxyChannlCtx().writeAndFlush(proxyData);
+		try {
+
+			ChannelRelation relation = serverChannelManager.getChannelRelation(ctx);
+
+			if(null != relation) {
+				ProxyDataMessage proxyData = new ProxyDataMessage();
+
+				proxyData.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.CLOSE_CONNECT);
+				proxyData.setSource(ctx.channel().id().asLongText());
+				proxyData.setTarget(relation.getRemotChannel());
+
+				serverChannelManager.proxyChannlCtx().writeAndFlush(proxyData);
+			}
+		} finally {
+			serverChannelManager.remove(ctx);
+			logger.info("bus server close {}", ctx.channel().id().asShortText());
 		}
-		
-		logger.info("bus server close {}", ctx.channel().id().asShortText());
+
 	}
 	
 	

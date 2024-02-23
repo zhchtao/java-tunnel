@@ -1,13 +1,9 @@
 package com.smvcsh.proxy.manager;
 
 import com.smvcsh.proxy.client.ProxyTcpBusClient;
-import com.smvcsh.proxy.client.ProxyTcpDataClient;
-import com.smvcsh.proxy.manager.ChannelManager;
+import com.smvcsh.proxy.client.ProxyTcpTunnelClient;
 import io.netty.channel.ChannelFuture;
 import lombok.Data;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 //@Component
 @Data
@@ -19,11 +15,11 @@ public class ClientChannelManager extends ChannelManager {
 	
 //	@Resource
 	private ProxyTcpBusClient busClient;
-	private ProxyTcpDataClient dataClient;
+	private ProxyTcpTunnelClient dataClient;
 
 	public ClientChannelManager(String host, int port) {
 		this.busClient = new ProxyTcpBusClient(this);
-		this.dataClient = new ProxyTcpDataClient(this);
+		this.dataClient = new ProxyTcpTunnelClient(this);
 		this.host = host;
 		this.port = port;
 	}
