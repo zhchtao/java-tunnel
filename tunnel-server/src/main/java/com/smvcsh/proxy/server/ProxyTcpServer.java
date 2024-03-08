@@ -1,15 +1,13 @@
 package com.smvcsh.proxy.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class ProxyTcpServer {
 	
 	private final EventLoopGroup bossGroup;
@@ -60,12 +58,11 @@ public abstract class ProxyTcpServer {
 			channelFuture = bootstrap.bind(port).sync();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally {
-			
+			log.error(e.getMessage(), e);
+			Thread.currentThread().interrupt();
 		}
-		
-	}
+
+    }
 	public void stop() {
 		try {
 			channelFuture.channel().closeFuture().sync();
