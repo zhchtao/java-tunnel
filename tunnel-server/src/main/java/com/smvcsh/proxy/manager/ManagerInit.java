@@ -61,9 +61,9 @@ public class ManagerInit implements ApplicationRunner {
 	private void initServer() {
 		// TODO Auto-generated method stub
 		try {
-			logger.info("start proxy data server with {}......", dataServerPort);
+			logger.info("start proxy tunnel server with {}......", dataServerPort);
 			proxyTcpDataServer.start(dataServerPort);
-			logger.info("start proxy data server complete!");
+			logger.info("start proxy tunnel server complete!");
 			
 			for(IpRelation relation : ipRelationMap.values()) {
 				logger.info("start proxy bus server with {}......", relation.getPort());
