@@ -36,30 +36,15 @@ public class ManagerInit implements ApplicationRunner {
 	private int dataServerPort;
 	@Value("${proxy.data.server.host:127.0.0.1}")
 	private String dataServerHost;
-	
-	@Value("${proxy.data.server.type:test}")
-//	@Value("${proxy.data.server.type:server}")
-//	@Value("${proxy.data.server.type:client}")
-	private String serverType;
 
 	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		// TODO Auto-generated method stub
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
+	public void run(ApplicationArguments args) {
 
-				initServer();
-			}
-		}).start();
-		
+		new Thread(() -> initServer()).start();
 	}
 
 
 	private void initServer() {
-		// TODO Auto-generated method stub
 		try {
 			logger.info("start proxy tunnel server with {}......", dataServerPort);
 			proxyTcpDataServer.start(dataServerPort);
@@ -71,7 +56,6 @@ public class ManagerInit implements ApplicationRunner {
 			}
 			logger.info("start proxy bus server complete!");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			logger.error(e.getMessage(), e);
 			System.exit(0);
 		}
@@ -85,13 +69,12 @@ public class ManagerInit implements ApplicationRunner {
 			ProxyDataMessage msg = new ProxyDataMessage();
 			msg.setOperateCode(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT_CHECK);
 
-			logger.info("server check {}", serverChannelManager.proxyChannlCtxSize());
+			logger.info("server check {}", serverChannelManager.tunnelCtxSize());
 
-			if(serverChannelManager.proxyChannlCtxSize() > 0) {
+			if(serverChannelManager.tunnelCtxSize() > 0) {
 				serverChannelManager.proxyChannlCtx().writeAndFlush(msg);
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
 			logger.error(e.getMessage(), e);
 		}
 		
