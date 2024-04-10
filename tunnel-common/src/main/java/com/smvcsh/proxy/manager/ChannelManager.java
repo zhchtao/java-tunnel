@@ -15,7 +15,7 @@ public class ChannelManager {
 	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	protected List<ChannelHandlerContext> channelHandlers = new ArrayList<>();
+	protected List<ChannelHandlerContext> tunnelHandlers = new ArrayList<>();
 	
 	protected Map<String, ChannelRelation> idChannelHandlerMap = new HashMap<>();
 	
@@ -26,13 +26,13 @@ public class ChannelManager {
 	 */
 	public ChannelHandlerContext proxyChannlCtx() {
 		
-		if(channelHandlers.isEmpty()) {
+		if(tunnelHandlers.isEmpty()) {
 			throw new ProjectException("暂无连接可用！");
 		}
 		
-		step = (step + 1) % channelHandlers.size();
+		step = (step + 1) % tunnelHandlers.size();
 		
-		ChannelHandlerContext proxyDataCtx = channelHandlers.get(step);
+		ChannelHandlerContext proxyDataCtx = tunnelHandlers.get(step);
 		
 		if(proxyDataCtx.isRemoved()) {
 			throw new ProjectException("proxyDataCtx is Unavailable!");
@@ -43,7 +43,7 @@ public class ChannelManager {
 	
 	public void addTunnelCtx(ChannelHandlerContext ctx) {
 		
-		channelHandlers.add(ctx);
+		tunnelHandlers.add(ctx);
 	}
 	
 	public void addChannelCtx(ChannelHandlerContext ctx) {
@@ -58,23 +58,19 @@ public class ChannelManager {
 	}
 	
 	public ChannelHandlerContext getChannelCtx(String ctxId) {
-		// TODO Auto-generated method stub
 		ChannelRelation ctx = getChannelRelation(ctxId);
 		return ctx == null ? null : ctx.getCtx();
 	}
 	
 	public ChannelRelation getChannelRelation(String ctxId) {
-		// TODO Auto-generated method stub
 		return idChannelHandlerMap.get(ctxId);
 	}
 	
 	public ChannelRelation getChannelRelation(ChannelHandlerContext ctx) {
-		// TODO Auto-generated method stub
 		return getChannelRelation(ctx.channel().id().asLongText());
 	}
 
 	public void remove(ChannelHandlerContext targetCtx) {
-		// TODO Auto-generated method stub
 		synchronized(targetCtx) {
 			String key = targetCtx.channel().id().asLongText();
 			
@@ -85,13 +81,12 @@ public class ChannelManager {
 		}
 	}
 
-	public int proxyChannlCtxSize() {
-		// TODO Auto-generated method stub
-		return this.channelHandlers.size();
+	public int tunnelCtxSize() {
+		return this.tunnelHandlers.size();
 	}
 
 	public void removeTunnelCtx(ChannelHandlerContext ctx) {
-		channelHandlers.remove(ctx);
+		tunnelHandlers.remove(ctx);
 		idChannelHandlerMap.values()
 				.forEach(v -> {
 					try {

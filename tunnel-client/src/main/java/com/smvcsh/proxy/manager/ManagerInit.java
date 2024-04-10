@@ -100,9 +100,9 @@ public class ManagerInit implements ApplicationRunner {
 
 			try {
 
-				logger.info("client check {}", manager.proxyChannlCtxSize());
+				logger.info("client check {}", manager.tunnelCtxSize());
 
-				if(manager.proxyChannlCtxSize() > 0) {
+				if(manager.tunnelCtxSize() > 0) {
 
 					manager.proxyChannlCtx().writeAndFlush(msg);
 				}else {

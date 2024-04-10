@@ -15,8 +15,7 @@ public class ProxyServerTunnelChannelHandlerAdapter extends ProxyServerChannelHa
 
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		// TODO Auto-generated method stub
-		
+
 		logger.info("tunnel server connected {}", ctx.channel().id().asShortText());
 		
 		serverChannelManager.addTunnelCtx(ctx);
@@ -25,14 +24,12 @@ public class ProxyServerTunnelChannelHandlerAdapter extends ProxyServerChannelHa
 	
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		// TODO Auto-generated method stub
 		serverChannelManager.removeTunnelCtx(ctx);
 		logger.info("tunnel server removed:{}", ctx.channel().id().asShortText());
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		// TODO Auto-generated method stub
 
 		try {
 			
@@ -78,7 +75,6 @@ public class ProxyServerTunnelChannelHandlerAdapter extends ProxyServerChannelHa
 			targetCtx.writeAndFlush(td);
 			
 		} finally {
-			// TODO: handle finally clause
 			ReferenceCountUtil.release(msg);
 		}
 		
@@ -86,7 +82,6 @@ public class ProxyServerTunnelChannelHandlerAdapter extends ProxyServerChannelHa
 
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-		// TODO Auto-generated method stub
 
 		logger.info("tunnel time out");
 
