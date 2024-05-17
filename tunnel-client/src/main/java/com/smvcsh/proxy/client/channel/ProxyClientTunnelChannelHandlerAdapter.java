@@ -11,7 +11,6 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
 import lombok.NonNull;
-import org.apache.commons.lang3.StringUtils;
 /**
  * @author taotao
  *
@@ -53,10 +52,9 @@ public class ProxyClientTunnelChannelHandlerAdapter extends ProxyClientChannelHa
 				return;
 			}
 			
-			String target = data.getTarget();
 			String source = data.getSource();
 			
-			ChannelHandlerContext targetCtx = clientChannelManager.getChannelCtx(StringUtils.isNotBlank(target) ? target: source);
+			ChannelHandlerContext targetCtx = clientChannelManager.getChannelCtx(source);
 
 			
 			if(ProxyTunnelMessageConstants.OPERATE_CODE.CLOSE_CONNECT == data.getOperateCode()) {
@@ -106,7 +104,7 @@ public class ProxyClientTunnelChannelHandlerAdapter extends ProxyClientChannelHa
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 		// TODO Auto-generated method stub
 
-		logger.info("tunnel time out");
+		logger.info("tunnel time out:{}", ctx);
 
 		ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
 				.addListener(ChannelFutureListener.CLOSE);

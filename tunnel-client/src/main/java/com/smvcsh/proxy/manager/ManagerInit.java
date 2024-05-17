@@ -3,92 +3,82 @@ package com.smvcsh.proxy.manager;
 import com.smvcsh.proxy.client.ProxyTcpClient;
 import com.smvcsh.proxy.handler.ProxyDataMessage;
 import com.smvcsh.proxy.handler.constants.ProxyTunnelMessageConstants;
-import com.smvcsh.proxy.manager.relation.IpRelation;
 import io.netty.channel.ChannelFuture;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Component
-public class ManagerInit implements ApplicationRunner {
+public class ManagerInit {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	@Resource
-	private Map<Integer, IpRelation> ipRelationMap;
-	
-	@Value("#{'${proxy.data.server:192.168.1.100:10000}'.split(',')}")
-	private List<String> dataServer;
+
+    @Value("#{'${proxy.data.server:192.168.1.100:10000}'.split(',')}")
+	private List<String> tunnelServerList;
 	private List<ClientChannelManager> cmList;
-
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		cmList = dataServer.stream()
-				.map(dataServer -> dataServer.split(":"))
-				.filter(dataServer -> ArrayUtils.getLength(dataServer) == 2)
-				.map(dataServer -> new ClientChannelManager(dataServer[0], Integer.parseInt(dataServer[1])))
+	private ExecutorService executors;
+	@PostConstruct
+	private void init() {
+		executors = Executors.newFixedThreadPool(tunnelServerList.size() + 1);
+		cmList = tunnelServerList.stream()
+				.map(tunnelServer -> tunnelServer.split(":"))
+				.filter(tunnelServer -> ArrayUtils.getLength(tunnelServer) == 2)
+				.map(tunnelServerInfo -> new ClientChannelManager(tunnelServerInfo[0], Integer.parseInt(tunnelServerInfo[1])))
 				.collect(Collectors.toList());
-		// TODO Auto-generated method stub
-		cmList.forEach(manager -> new Thread(() -> {
-			initClient(manager);
-		}).start());
-
+		cmList.forEach(this::initClient);
+	}
+	@PreDestroy
+	private void destroy() {
+		logger.info("executors shutdown......");
+		executors.shutdown();
 	}
 	public void initClient(ClientChannelManager manager) {
-		// TODO Auto-generated method stub
-		
-		synchronized (manager) {
-			
-			if(manager.isStarting()) {
-				
-				return;
-			}
+		executors.submit(() -> {
 
-			manager.setStarting(true);
-		}
-		
-		ChannelFuture f = null;
-		
-		long step = 0;
-		
-		do {
-			
-			try {
-				
-				logger.info("step:{}", step);
-				
-				if(step ++ > 0){
-					
-					Thread.sleep(5000);
+			synchronized (manager) {
+				if(manager.isStarting()) {
+					return;
 				}
-				
-				ProxyTcpClient client = manager.getDataClient();
-				
-				logger.info("start proxy client");
-
-				f = client.connect(manager.getHost(), manager.getPort());
-
-				logger.info(f.channel().toString());
-
-				logger.info("start proxy client complete!");
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				logger.error(e.getMessage(), e);
+				manager.setStarting(true);
 			}
-			
-		} while (f == null || !f.isSuccess());
-		manager.setStarting(false);
+
+			ChannelFuture f = null;
+			long step = 0;
+
+			do {
+				try {
+					logger.info("step:{}", step);
+
+					if(step ++ > 0){
+						Thread.sleep(5000);
+					}
+
+					ProxyTcpClient client = manager.getDataClient();
+
+					logger.info("start tunnel client");
+
+					f = client.connect(manager.getHost(), manager.getPort());
+
+					logger.info("start tunnel client complete!:{}", f.channel());
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					logger.error(e.getMessage(), e);
+				}
+
+			} while (f == null || !f.isSuccess());
+			manager.setStarting(false);
+		});
 	}
 
 

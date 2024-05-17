@@ -8,16 +8,15 @@ import com.smvcsh.proxy.server.ProxyTcpTunnelServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Map;
 
 @Component
-public class ManagerInit implements ApplicationRunner {
+public class ManagerInit {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -25,7 +24,7 @@ public class ManagerInit implements ApplicationRunner {
 	private ChannelManager serverChannelManager;
 
 	@Resource
-	private ProxyTcpTunnelServer proxyTcpDataServer;
+	private ProxyTcpTunnelServer proxyTcpTunnelServer;
 	@Resource
 	private ProxyTcpBusServer proxyTcpBusServer;
 	
@@ -37,21 +36,19 @@ public class ManagerInit implements ApplicationRunner {
 	@Value("${proxy.data.server.host:127.0.0.1}")
 	private String dataServerHost;
 
-	@Override
-	public void run(ApplicationArguments args) {
-
+	@PostConstruct
+	private void init() {
 		new Thread(() -> initServer()).start();
 	}
 
-
 	private void initServer() {
 		try {
-			logger.info("start proxy tunnel server with {}......", dataServerPort);
-			proxyTcpDataServer.start(dataServerPort);
+			logger.info("start proxy tunnel server with {} ......", dataServerPort);
+			proxyTcpTunnelServer.start(dataServerPort);
 			logger.info("start proxy tunnel server complete!");
 			
 			for(IpRelation relation : ipRelationMap.values()) {
-				logger.info("start proxy bus server with {}......", relation.getPort());
+				logger.info("start proxy bus server with {} ......", relation.getPort());
 				proxyTcpBusServer.start(relation.getPort());
 			}
 			logger.info("start proxy bus server complete!");

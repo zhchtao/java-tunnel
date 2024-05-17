@@ -32,7 +32,6 @@ public class AgentInit {
         workDir = new File(workDir).getAbsolutePath();
         new Thread(() -> {
             while (true) {
-                URLClassLoader cl = null;
                 try {
                     String jar = url + "/jnlpJars/agent.jar";
                     log.info("jar file:{}", jar);
@@ -42,27 +41,27 @@ public class AgentInit {
                         FileUtils.copyURLToFile(jarUrl, jarFile);
                         jarUrl = jarFile.toURI().toURL();
                     }
-                    cl = new URLClassLoader(new URL[]{jarUrl}, null);
-                    cl.loadClass("hudson.remoting.Launcher")
-                            .getDeclaredMethod("main", String[].class)
-                            .invoke(null, new Object[]{new String[]{
-                                    "-jnlpUrl",
-                                    jnlpUrl,
-                                    "-secret",
-                                    secret,
-                                    "-workDir",
-                                    workDir
-                            }});
-                    break;
+                    try (URLClassLoader cl = new URLClassLoader(new URL[]{jarUrl}, null)){
+
+                        cl.loadClass("hudson.remoting.Launcher")
+                                .getDeclaredMethod("main", String[].class)
+                                .invoke(null, new Object[]{new String[]{
+                                        "-jnlpUrl",
+                                        jnlpUrl,
+                                        "-secret",
+                                        secret,
+                                        "-workDir",
+                                        workDir
+                                }});
+                    }
+                    log.error("agent is stopped");
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                } finally {
                     try {
                         TimeUnit.SECONDS.sleep(1);
-                        if (null != cl) {
-
-                            cl.close();
-                        }
-                    } catch (Exception ex) {//NOSONAR
+                    } catch (Exception e) {
+                        Thread.currentThread().interrupt();
                         log.error(e.getMessage(), e);
                     }
                 }
