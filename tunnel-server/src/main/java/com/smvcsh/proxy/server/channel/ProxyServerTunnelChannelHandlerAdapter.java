@@ -9,6 +9,9 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
 @Sharable
 @Component
 public class ProxyServerTunnelChannelHandlerAdapter extends ProxyServerChannelHandlerAdapter {
@@ -43,9 +46,8 @@ public class ProxyServerTunnelChannelHandlerAdapter extends ProxyServerChannelHa
 			
 			if(ProxyTunnelMessageConstants.OPERATE_CODE.CONNECT == data.getOperateCode()) {
 				
-				ChannelHandlerContext c = serverChannelManager.getChannelCtx(data.getTarget());
-				
-				serverChannelManager.addChannelCtx(c, data.getSource());
+				Optional.ofNullable(serverChannelManager.getChannelCtx(data.getTarget()))
+						.ifPresent(c -> serverChannelManager.addChannelCtx(c, data.getSource()));
 				
 				return;
 			}

@@ -20,13 +20,11 @@ public class ProxyClientChannelHandlerAdapter extends ChannelInboundHandlerAdapt
 	
 	protected static Logger logger = LoggerFactory.getLogger(ProxyClientChannelHandlerAdapter.class);
 	
-//	@Resource
 	@NonNull
 	protected ClientChannelManager clientChannelManager;
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		// TODO Auto-generated method stub
 		logger.error(ctx.toString(), cause);
 
 		if (ctx.isRemoved()) {
