@@ -16,8 +16,8 @@ public class Constants {
     public static final String ARGS_NAME = "args";
 
     public static final Class[] INCLUDE_ANNOTATIONS = new Class[] {
-        Cached.class,
-        CacheInvalidate.class,
-        CacheUpdate.class
-    };;
+            Cached.class,
+            CacheInvalidate.class,
+            CacheUpdate.class
+    };
 }

@@ -42,14 +42,16 @@ public class JetCacheIntercept {
         String[] parameterNames = signature.getParameterNames();
 
         context.setVariable(Constants.ARGS_NAME, args);
-        IntStream.range(0, parameterNames.length).forEach(i -> {
-            context.setVariable(parameterNames[i], args[i]);
-        });
+        IntStream.range(0, parameterNames.length)
+                .forEach(i ->
+                        context.setVariable(parameterNames[i], args[i])
+                );
         context.setBeanResolver((ctx, name) -> beans.get(name));
 
-        String area = parser.parseExpression(epelArea).getValue(context, String.class);
+        String area = parser.parseExpression(epelArea) //NOSONAR 表达式并非用户输入，不存在安全问题
+                .getValue(context, String.class);
+        
         Object jetCacheService = beans.get(method.getDeclaringClass().getSimpleName() + area);
-
         if (null == jetCacheService) {
             throw new IllegalArgumentException("区域配置不存在,area:" + area);
         }
