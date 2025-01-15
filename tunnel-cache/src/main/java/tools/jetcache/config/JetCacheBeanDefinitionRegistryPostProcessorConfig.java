@@ -10,6 +10,7 @@ import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.matcher.ElementMatchers;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -94,8 +95,9 @@ public class JetCacheBeanDefinitionRegistryPostProcessorConfig implements BeanDe
                         Class<? extends ClassLoader> currentClassLoader = byteArrayClassLoader.getParent().getClass();
                         /**
                          * PandoraBootstrap 特殊处理
+                         * 普通spring boot项目，只需要通过BeanFactoryPostProcessor配置自定义ClassLoader即可
                          */
-                        if ("com.taobao.pandora.boot.loader.ReLaunchURLClassLoader".equals(currentClassLoader.getName())) {
+                        if (StringUtils.startsWith(currentClassLoader.getName(), "com.taobao.pandora.boot.loader.")) {
                             try {
                                 if (null == defineClass[0]) {
                                     defineClass[0] = JetCacheUtils.getMethod(ClassLoader.class, "defineClass", String.class, byte[].class, int.class, int.class);
