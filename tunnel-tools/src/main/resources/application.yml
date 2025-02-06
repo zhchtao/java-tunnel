@@ -1,0 +1,44 @@
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson
+#      valueEncoder: bean:fastjsonEncoder
+#      valueDecoder: bean:fastjsonDecoder
+      host: 172.16.70.118
+      port: 6379
+      database: 0
+#      password:
+      uri: redis://${jetcache.remote.default.host}:${jetcache.remote.default.port}/
+      poolConfig:
+        max-total: 1500
+        max-idle: 1000
+        min-idle: 0
+        max-wait-millis: 10000
+        time-between-eviction-runs-millis: 2000
+        min-evictable-idle-time-millis: 4000
+        soft-min-evictable-idle-time-millis: 4000
+    aaa:
+      type: redis
+      keyConvertor: fastjson
+#      valueEncoder: bean:fastjsonEncoder
+#      valueDecoder: bean:fastjsonDecoder
+      host: 172.16.70.118
+      port: 6379
+      database: 1
+#      password:
+      uri: redis://${jetcache.remote.default.host}:${jetcache.remote.default.port}/
+      poolConfig:
+        max-total: 1500
+        max-idle: 1000
+        min-idle: 0
+        max-wait-millis: 10000
+        time-between-eviction-runs-millis: 2000
+        min-evictable-idle-time-millis: 4000
+        soft-min-evictable-idle-time-millis: 4000

@@ -28,6 +28,7 @@
         <module>tunnel-client</module>
         <module>tunnel-common</module>
         <module>tunnel-jenkins-agent</module>
+        <module>tunnel-tools</module>
         <module>tunnel-cache</module>
     </modules>
 
